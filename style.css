@@ -79,4 +79,5 @@ input[type=checkbox]{width:auto;margin:3px 8px 0 0}
 
 .msg{min-height:1.3em;font-size:.9rem;margin:8px 0 0}
 .msg.ok{color:var(--ok)}.msg.err{color:var(--err)}
+.wk{display:block;margin-top:5px;min-height:1.2em;font-size:.84rem;font-weight:700;color:var(--ac)}
 .hide{display:none}

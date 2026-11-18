@@ -14,6 +14,22 @@ function ident(nom){
   var s=nom.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,".").replace(/^\.+|\.+$/g,"");
   return s?"echange."+s+"@gmail.com":"";
 }
+/* Numéro de semaine : la semaine 1 commence le premier lundi de l'année */
+function firstMonday(y){
+  var d=new Date(Date.UTC(y,0,1));
+  return Date.UTC(y,0,1+(8-d.getUTCDay())%7);
+}
+function weekNum(iso){
+  if(!iso)return null;
+  var p=iso.split("-"),y=+p[0],t=Date.UTC(y,+p[1]-1,+p[2]),f=firstMonday(y);
+  if(t<f){y--;f=firstMonday(y)}
+  return Math.floor((t-f)/604800000)+1;
+}
+function wkLabel(a,b){
+  var x=weekNum(a),z=weekNum(b);
+  if(!x)return"";
+  return !z||x===z?"sem. "+x:"sem. "+x+" à "+z;
+}
 function el(tag,cls,txt,t){
   var e=document.createElement(tag);
   if(cls)e.className=cls;
@@ -41,6 +57,13 @@ function paint(){
   $("sW").querySelectorAll("button").forEach(function(b){b.classList.toggle("on",st.want.indexOf(b.textContent)>=0)});
 }
 paint();
+
+["d1","d2"].forEach(function(id,k){
+  $(id).addEventListener("input",function(){
+    var n=weekNum($(id).value);
+    $("w"+(k+1)).textContent=n?"Semaine "+n:"";
+  });
+});
 
 /* --- Navigation --- */
 function show(v){["vAuth","vApp"].forEach(function(x){$(x).classList.toggle("hide",x!==v)})}
@@ -151,7 +174,7 @@ async function loadBoard(){
     var w=el("div","want");
     w.appendChild(el("span","lbl","Cherche"));
     o.types_voulus.forEach(function(tv){w.appendChild(el("span","chip",tv,tv))});
-    var info=el("div","info","Du "+fd(o.date_debut)+" au "+fd(o.date_fin)+" · "+o.prenom+(o.user_id===me.id?" (toi)":""));
+    var info=el("div","info","Du "+fd(o.date_debut)+" au "+fd(o.date_fin)+" ("+wkLabel(o.date_debut,o.date_fin)+") · "+o.prenom+(o.user_id===me.id?" (toi)":""));
     var ac=el("div","acts");
     d.appendChild(head);d.appendChild(w);d.appendChild(info);
     var list=by[o.id]||[];
