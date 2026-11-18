@@ -14,16 +14,13 @@ function ident(nom){
   var s=nom.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,".").replace(/^\.+|\.+$/g,"");
   return s?"echange."+s+"@gmail.com":"";
 }
-/* Numéro de semaine : la semaine 1 commence le premier lundi de l'année */
-function firstMonday(y){
-  var d=new Date(Date.UTC(y,0,1));
-  return Date.UTC(y,0,1+(8-d.getUTCDay())%7);
-}
+/* Numéro de semaine ISO 8601 : semaine du lundi au dimanche, semaine 1 = celle qui contient le 4 janvier */
 function weekNum(iso){
   if(!iso)return null;
-  var p=iso.split("-"),y=+p[0],t=Date.UTC(y,+p[1]-1,+p[2]),f=firstMonday(y);
-  if(t<f){y--;f=firstMonday(y)}
-  return Math.floor((t-f)/604800000)+1;
+  var p=iso.split("-"),d=new Date(Date.UTC(+p[0],+p[1]-1,+p[2]));
+  d.setUTCDate(d.getUTCDate()+4-(d.getUTCDay()||7));
+  var y0=Date.UTC(d.getUTCFullYear(),0,1);
+  return Math.ceil(((d-y0)/86400000+1)/7);
 }
 function wkLabel(a,b){
   var x=weekNum(a),z=weekNum(b);
